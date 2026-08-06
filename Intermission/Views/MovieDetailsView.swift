@@ -1,86 +1,176 @@
 import SwiftUI
 
 struct MovieDetailsView: View {
+    
+    var movieId: Int
+    
+    @StateObject private var viewModel = MovieDetailsViewModel()
+    @EnvironmentObject var watchlistManager: WatchlistManager
+    
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                // Header (Poster Placeholder)
-                ZStack(alignment: .bottomLeading) {
-                    Rectangle()
-                        .fill(Color.gray.opacity(0.3))
-                        .frame(height: 300)
-                        .overlay {
-                            Image(systemName: "photo")
-                                .font(.system(size: 60))
-                                .foregroundColor(.gray.opacity(0.5))
-                        }
-                }
+            
+            if viewModel.isLoading {
+                ProgressView()
+                    .padding(.top, 100)
+            }
+            
+            else if let movie = viewModel.movieDetails {
                 
-                VStack(alignment: .leading, spacing: 16) {
-                    // Title and Metadata
-                    Text("Placeholder Movie Title")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
+                VStack(spacing: 24) {
                     
-                    HStack(spacing: 12) {
-                        Label("8.5/10", systemImage: "star.fill")
-                            .foregroundColor(.yellow)
-                        Text("•")
-                        Text("2h 15m")
-                        Text("•")
-                        Text("2026")
+                    // MARK: - Poster
+                    
+                    AsyncImage(url: movie.posterURL) { phase in
+                        switch phase {
+                            
+                        case .empty:
+                            RoundedRectangle(cornerRadius: 20)
+                                .fill(Color.gray.opacity(0.3))
+                                .frame(width: 220, height: 320)
+                                .overlay(ProgressView())
+                            
+                        case .success(let image):
+                            image
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 220, height: 320)
+                                .clipShape(RoundedRectangle(cornerRadius: 20))
+                                .shadow(radius: 8)
+                            
+                        case .failure:
+                            RoundedRectangle(cornerRadius: 20)
+                                .fill(Color.gray.opacity(0.3))
+                                .frame(width: 220, height: 320)
+                                .overlay(
+                                    Image(systemName: "photo")
+                                        .font(.system(size: 50))
+                                        .foregroundColor(.gray)
+                                )
+                            
+                        @unknown default:
+                            EmptyView()
+                        }
                     }
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
                     
-                    // Genres
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack {
-                            ForEach(["Action", "Sci-Fi", "Adventure"], id: \.self) { genre in
-                                Text(genre)
-                                    .font(.caption)
-                                    .padding(.horizontal, 12)
-                                    .padding(.vertical, 6)
-                                    .background(Color.secondary.opacity(0.2))
-                                    .cornerRadius(16)
+                    // MARK: - Movie Info Card
+                    
+                    VStack(alignment: .leading, spacing: 16) {
+                        
+                        Text(movie.title)
+                            .font(.title)
+                            .fontWeight(.bold)
+                        
+                        HStack(spacing: 10) {
+                            
+                            if let rating = movie.voteAverage {
+                                Label(String(format: "%.1f", rating), systemImage: "star.fill")
+                                    .foregroundColor(.yellow)
+                            }
+                            
+                            if let runtime = movie.runtime {
+                                Text("•")
+                                Text("\(runtime / 60)h \(runtime % 60)m")
+                            }
+                            
+                            if let releaseDate = movie.releaseDate {
+                                Text("•")
+                                Text(String(releaseDate.prefix(4)))
                             }
                         }
-                    }
-                    
-                    // Action Buttons
-                    HStack(spacing: 16) {
+                        .foregroundColor(.secondary)
+                        .font(.subheadline)
+                        
+                        if let genres = movie.genres, !genres.isEmpty {
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack {
+                                    ForEach(genres) { genre in
+                                        Text(genre.name)
+                                            .font(.caption)
+                                            .padding(.horizontal, 12)
+                                            .padding(.vertical, 8)
+                                            .background(.thinMaterial)
+                                            .clipShape(Capsule())
+                                    }
+                                }
+                            }
+                        }
+                        
+                        let isInWatchlist = watchlistManager.contains(movie)
+                        
                         Button {
-                            // TODO: Add to watchlist
+                            watchlistManager.toggle(movie)
                         } label: {
-                            Label("Watchlist", systemImage: "plus")
-                                .frame(maxWidth: .infinity)
+                            
+                            Label(
+                                isInWatchlist ? "Added to Watchlist" : "Add to Watchlist",
+                                systemImage: isInWatchlist ? "checkmark.circle.fill" : "plus.circle.fill"
+                            )
+                            .frame(maxWidth: .infinity)
+                            .padding()
                         }
                         .buttonStyle(.borderedProminent)
-                        .controlSize(.large)
+                        .tint(isInWatchlist ? .green : .blue)
                     }
-                    .padding(.top, 8)
+                    .padding()
+                    .background(.thinMaterial)
+                    .clipShape(RoundedRectangle(cornerRadius: 20))
+                    .padding(.horizontal)
                     
-                    // Overview
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Overview")
-                            .font(.title3)
-                            .fontWeight(.semibold)
+                    // MARK: - Overview Card
+                    
+                    if let overview = movie.overview,
+                       !overview.isEmpty {
                         
-                        Text("This is a placeholder description for the movie. It provides a brief overview of the plot, the main characters, and the setting. When real API integration is added, this text will display the actual synopsis fetched from the server.")
-                            .font(.body)
-                            .foregroundColor(.secondary)
-                            .lineSpacing(4)
+                        VStack(alignment: .leading, spacing: 12) {
+                            
+                            Text("Overview")
+                                .font(.title3)
+                                .fontWeight(.semibold)
+                            
+                            Text(overview)
+                                .foregroundColor(.secondary)
+                                .lineSpacing(5)
+                        }
+                        .padding()
+                        .background(.thinMaterial)
+                        .clipShape(RoundedRectangle(cornerRadius: 20))
+                        .padding(.horizontal)
                     }
                 }
-                .padding()
+                .padding(.vertical)
+            }
+            
+            else if let error = viewModel.errorMessage {
+                
+                VStack(spacing: 16) {
+                    
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .font(.largeTitle)
+                        .foregroundColor(.orange)
+                    
+                    Text(error)
+                        .multilineTextAlignment(.center)
+                    
+                    Button("Retry") {
+                        viewModel.fetchDetails(id: movieId)
+                    }
+                    .buttonStyle(.borderedProminent)
+                }
+                .padding(.top, 100)
             }
         }
+        .navigationTitle("Movie")
         .navigationBarTitleDisplayMode(.inline)
+        .task {
+            viewModel.fetchDetails(id: movieId)
+        }
     }
 }
 
 #Preview {
     NavigationStack {
-        MovieDetailsView()
+        MovieDetailsView(movieId: 550)
+            .environmentObject(WatchlistManager())
     }
 }

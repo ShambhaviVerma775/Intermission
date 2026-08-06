@@ -2,6 +2,7 @@ import SwiftUI
 
 struct SectionHeader: View {
     var title: String
+    var destination: AnyView? = nil
     
     var body: some View {
         HStack {
@@ -11,12 +12,12 @@ struct SectionHeader: View {
             
             Spacer()
             
-            Button {
-                // TODO: Handle see all action
-            } label: {
-                Text("See All")
-                    .font(.subheadline)
-                    .fontWeight(.medium)
+            if let dest = destination {
+                NavigationLink(destination: dest) {
+                    Text("See All")
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                }
             }
         }
         .padding(.horizontal)

@@ -9,9 +9,13 @@ import SwiftUI
 
 @main
 struct IntermissionApp: App {
+    // Shared state for the watchlist
+    @StateObject private var watchlistManager = WatchlistManager()
+    
     var body: some Scene {
         WindowGroup {
             SplashView()
+                .environmentObject(watchlistManager)
         }
     }
 }

@@ -1,12 +1,14 @@
 import SwiftUI
 
 struct SettingsView: View {
+    @EnvironmentObject var watchlistManager: WatchlistManager
+    
     var body: some View {
         NavigationStack {
             List {
                 Section(header: Text("Account")) {
                     Button(role: .destructive) {
-                        // TODO: Handle clear watchlist
+                        watchlistManager.clear()
                     } label: {
                         Text("Clear Watchlist")
                     }
@@ -32,4 +34,5 @@ struct SettingsView: View {
 
 #Preview {
     SettingsView()
+        .environmentObject(WatchlistManager())
 }
