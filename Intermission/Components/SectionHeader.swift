@@ -9,6 +9,7 @@ struct SectionHeader: View {
             Text(title)
                 .font(.title2)
                 .fontWeight(.bold)
+                .foregroundColor(.cinemaWhite)
             
             Spacer()
             
@@ -17,6 +18,7 @@ struct SectionHeader: View {
                     Text("See All")
                         .font(.subheadline)
                         .fontWeight(.medium)
+                        .foregroundColor(.cinemaRed)
                 }
             }
         }

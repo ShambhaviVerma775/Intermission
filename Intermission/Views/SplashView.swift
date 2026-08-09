@@ -7,18 +7,23 @@ struct SplashView: View {
         if isActive {
             MainTabView()
         } else {
-            VStack {
-                Image(systemName: "film.stack")
-                    .font(.system(size: 80))
-                    .foregroundColor(.accentColor)
+            ZStack {
+                Color.cinemaBackground.ignoresSafeArea()
                 
-                Text("Intermission")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                    .padding(.top, 16)
+                VStack {
+                    Image(systemName: "film.stack")
+                        .font(.system(size: 80))
+                        .foregroundColor(.cinemaRed)
+                    
+                    Text("Intermission")
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                        .foregroundColor(.cinemaWhite)
+                        .padding(.top, 16)
+                }
             }
             .onAppear {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                     withAnimation {
                         isActive = true
                     }

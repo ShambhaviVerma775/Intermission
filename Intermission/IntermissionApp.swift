@@ -16,6 +16,8 @@ struct IntermissionApp: App {
         WindowGroup {
             SplashView()
                 .environmentObject(watchlistManager)
+                .preferredColorScheme(.dark)
+                .tint(.cinemaRed)
         }
     }
 }

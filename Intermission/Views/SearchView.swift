@@ -2,10 +2,18 @@ import SwiftUI
 
 struct SearchView: View {
     @StateObject private var viewModel = SearchViewModel()
-    
+
+    private let backgroundColor = Color(red: 13/255, green: 13/255, blue: 13/255)
+    private let cardColor = Color(red: 26/255, green: 26/255, blue: 26/255)
+    private let cinemaRed = Color(red: 215/255, green: 38/255, blue: 56/255)
+    private let softWhite = Color(red: 248/255, green: 248/255, blue: 248/255)
+
     var body: some View {
         NavigationStack {
             ZStack {
+                backgroundColor
+                    .ignoresSafeArea()
+
                 Group {
                     if viewModel.searchResults.isEmpty && !viewModel.isLoading {
                         EmptyStateView(
@@ -18,71 +26,89 @@ struct SearchView: View {
                             ForEach(viewModel.searchResults) { movie in
                                 NavigationLink(destination: MovieDetailsView(movieId: movie.id)) {
                                     HStack(spacing: 12) {
-                                        // Poster Thumbnail
+
                                         AsyncImage(url: movie.posterURL) { phase in
                                             switch phase {
                                             case .empty:
                                                 RoundedRectangle(cornerRadius: 8)
-                                                    .fill(Color.gray.opacity(0.3))
-                                                    .overlay(ProgressView())
+                                                    .fill(cardColor)
+                                                    .overlay(ProgressView().tint(cinemaRed))
+
                                             case .success(let image):
                                                 image
                                                     .resizable()
                                                     .aspectRatio(contentMode: .fill)
+
                                             case .failure:
                                                 RoundedRectangle(cornerRadius: 8)
-                                                    .fill(Color.gray.opacity(0.3))
-                                                    .overlay(Image(systemName: "film").foregroundColor(.gray))
+                                                    .fill(cardColor)
+                                                    .overlay(
+                                                        Image(systemName: "film")
+                                                            .foregroundColor(.gray)
+                                                    )
+
                                             @unknown default:
                                                 EmptyView()
                                             }
                                         }
                                         .frame(width: 50, height: 75)
                                         .cornerRadius(8)
-                                        
-                                        // Movie Details
+
                                         VStack(alignment: .leading, spacing: 4) {
                                             Text(movie.title)
                                                 .font(.headline)
-                                            
+                                                .foregroundColor(softWhite)
+
                                             if let releaseDate = movie.releaseDate {
-                                                // Extract just the year from "YYYY-MM-DD"
                                                 Text(String(releaseDate.prefix(4)))
                                                     .font(.subheadline)
-                                                    .foregroundColor(.secondary)
+                                                    .foregroundColor(.gray)
                                             }
                                         }
                                     }
                                 }
+                                .listRowBackground(cardColor)
                             }
                         }
                         .listStyle(.plain)
+                        .scrollContentBackground(.hidden)
                     }
                 }
-                
-                // Show loading indicator
+
                 if viewModel.isLoading {
                     ProgressView()
+                        .tint(cinemaRed)
                         .scaleEffect(1.5)
                 }
-                
-                // Show error message if it fails
+
                 if let errorMessage = viewModel.errorMessage {
-                    VStack {
+                    VStack(spacing: 12) {
                         Text(errorMessage)
-                            .foregroundColor(.red)
-                            .multilineTextAlignment(.center)
+                            .foregroundColor(softWhite)
+
                         Button("Retry") {
                             viewModel.performSearch()
                         }
-                        .padding(.top, 8)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 10)
+                        .background(cinemaRed)
+                        .foregroundColor(.white)
+                        .clipShape(Capsule())
                     }
+                    .padding()
+                    .background(cardColor)
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
                 }
             }
             .navigationTitle("Search")
+            .toolbarBackground(Color(red: 13/255, green: 13/255, blue: 13/255), for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
+            .toolbarColorScheme(.dark, for: .navigationBar)
+            .toolbarColorScheme(.dark, for: .navigationBar)
             .searchable(text: $viewModel.searchQuery, prompt: "Search movies...")
+            .tint(cinemaRed)
+
             .onSubmit(of: .search) {
-                // Trigger the search when the user presses return
                 viewModel.performSearch()
             }
         }

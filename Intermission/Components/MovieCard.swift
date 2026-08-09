@@ -11,7 +11,7 @@ struct MovieCard: View {
                 case .empty:
                     // Loading placeholder
                     RoundedRectangle(cornerRadius: 12)
-                        .fill(Color.gray.opacity(0.3))
+                        .fill(Color.cinemaCard)
                         .overlay(ProgressView())
                 case .success(let image):
                     // Successfully loaded image
@@ -22,8 +22,8 @@ struct MovieCard: View {
                 case .failure:
                     // Fallback when image fails to load
                     RoundedRectangle(cornerRadius: 12)
-                        .fill(Color.gray.opacity(0.3))
-                        .overlay(Image(systemName: "film").foregroundColor(.gray))
+                        .fill(Color.cinemaCard)
+                        .overlay(Image(systemName: "film").foregroundColor(.cinemaGray))
                 @unknown default:
                     EmptyView()
                 }
@@ -33,6 +33,7 @@ struct MovieCard: View {
             
             Text(movie.title)
                 .font(.headline)
+                .foregroundColor(.cinemaWhite)
                 .lineLimit(2)
                 .frame(width: 140, alignment: .leading)
         }
