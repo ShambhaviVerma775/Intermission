@@ -74,7 +74,7 @@ Intermission/
 ## Challenged/Issues I faced/am facing -
 - Regarding section header's reusability biasness in cretain views 
 - Use of "List" 
-- confused about the APIService.swift file and the calls made in it 
+- confused about the APIService.swift file- primarily all of the helper methods . 
 - Decoding nested JSON
 - Trail of WatchlistManager throughout the app 
 
