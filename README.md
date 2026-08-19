@@ -41,8 +41,44 @@ Intermission/
 ├── ViewModels/
 └── Views/
 ```
+## Itinerary 
+                    INTERMISSION APP
+                           │
+                           ▼
+      ┌──────────────────────────────┐
+      │            Views             │  ← What user sees
+      └──────────────────────────────┘
+                           │
+                           ▼
+      ┌──────────────────────────────┐
+      │         ViewModels           │  ← UI logic & state
+      └──────────────────────────────┘
+                           │
+                           ▼
+      ┌──────────────────────────────┐
+      │        API / Services        │  ← Gets & manages data
+      └──────────────────────────────┘
+                           │
+                           ▼
+      ┌──────────────────────────────┐
+      │           Models             │  ← Data structures
+      └──────────────────────────────┘
+      
+## Things I learned 
+- Decoding JSON to swift models (via models amd codable)
+- Implementation of the MVVM structure and it's importance 
+- State Management with property wrappers (specifically how some view model is shared globally and how some are only used for their specific views)
+- Undertstanding async/await and making API/Image/View calls 
+- Reusable swift components 
+
+## Challenged/Issues I faced/am facing -
+- Regarding section header's reusability biasness in cretain views 
+- Use of "List" 
+- confused about the APIService.swift file and the calls made in it 
+- Decoding nested JSON
+- Trail of WatchlistManager throughout the app 
 
 ## Disclosure 
-I used LLM for code completion and then for understanding swift concepts. Also currently I'm using it to understand whole of the code better and focusing on areas I'm struggling with. 
+I used LLM for code completion and then for understanding swift concepts. Also currently I'm using it to understand whole of the code better and focusing on areas I'm struggling with. The Itinerary diagram shown above in the README is also LLM generated 
 
 
